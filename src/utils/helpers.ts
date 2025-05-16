@@ -1,4 +1,4 @@
-import { format, subDays, startOfWeek, endOfWeek, parseISO, isWithinInterval } from 'date-fns';
+import { format, subDays, startOfWeek, endOfWeek, parseISO, isWithinInterval, getDayOfYear as dateFnsGetDayOfYear, getYear as dateFnsGetYear } from 'date-fns';
 import { MeditationEntry, User } from '../types'; // Ensure User is imported
 import { USER_IDS } from '../firebase/config';
 
@@ -24,6 +24,14 @@ export const getPreviousDays = (count: number): string[] => {
 
 export const getTodayDate = (): string => {
   return formatDate(new Date());
+};
+
+export const getDayOfYear = (date: Date): number => {
+  return dateFnsGetDayOfYear(date);
+};
+
+export const getYear = (date: Date): number => {
+  return dateFnsGetYear(date);
 };
 
 export const calculateTotalMinutes = (hours: number, minutes: number): number => {

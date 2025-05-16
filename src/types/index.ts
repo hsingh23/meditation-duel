@@ -7,14 +7,21 @@ export interface User {
 }
 
 export interface MeditationEntry {
-  id: string;
+  id: string; // docId will be year-userId-dayOfYear
   userId: string;
-  date: string;
+  date: string; // YYYY-MM-DD
+  totalMinutes: number;
+}
+
+export interface MeditationFormData extends MeditationEntry {
   hours: number;
   minutes: number;
-  totalMinutes: number;
-  createdAt: Date;
-  updatedAt: Date;
+}
+
+export interface YearlyMeditationLog {
+  [userId: string]: {
+    [dayOfYear: number]: number; // dayOfYear: 1-366, value: hours (float)
+  };
 }
 
 export interface MeditationStats {

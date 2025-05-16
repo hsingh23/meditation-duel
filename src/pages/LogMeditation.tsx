@@ -3,7 +3,8 @@ import useAuth from '../hooks/useAuth';
 import useMeditation from '../hooks/useMeditation';
 import DateSelector from '../components/meditation/DateSelector';
 import LogMeditationForm from '../components/meditation/LogMeditationForm';
-import { getPreviousDays } from '../utils/helpers';
+import { getPreviousDays, formatDuration } from '../utils/helpers';
+import CalendarView from '../components/meditation/CalendarView'; // Import CalendarView
 
 const LogMeditation: React.FC = () => {
   // Get the available dates (today and previous 3 days)
@@ -13,15 +14,38 @@ const LogMeditation: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(availableDates[0]);
   
   const { user } = useAuth();
-  const { loading, getEntryForDate, saveEntry } = useMeditation(user);
+  const { loading, getEntryForDate, saveEntry, users, entries } = useMeditation(user); // Add entries here
   
   // Get the existing entry for the selected date
   const existingEntry = getEntryForDate(selectedDate);
+
+  // Find current user's stats
+  const currentUserStats = users.find(u => u.id === user?.id)?.stats;
   
   return (
     <div className="max-w-lg mx-auto">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Log Your Meditation</h1>
       
+      {currentUserStats && (
+        <div className="mb-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200 text-center">
+          <h2 className="text-lg font-medium text-indigo-700 mb-2">Your Progress</h2>
+          <div className="grid grid-cols-3 gap-2 text-sm">
+            <div>
+              <p className="text-gray-600">Today</p>
+              <p className="font-bold text-indigo-600 text-lg">{formatDuration(currentUserStats.today)}</p>
+            </div>
+            <div>
+              <p className="text-gray-600">This Week</p>
+              <p className="font-bold text-indigo-600 text-lg">{formatDuration(currentUserStats.thisWeek)}</p>
+            </div>
+            <div>
+              <p className="text-gray-600">Overall</p>
+              <p className="font-bold text-indigo-600 text-lg">{formatDuration(currentUserStats.overall)}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <DateSelector
         dates={availableDates}
         selectedDate={selectedDate}
@@ -34,6 +58,12 @@ const LogMeditation: React.FC = () => {
         onSave={saveEntry}
         loading={loading}
       />
+
+      {user && entries && (
+        <div className="mt-8">
+          <CalendarView entries={entries} currentUserId={user.uid} />
+        </div>
+      )}
       
       <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <h3 className="text-lg font-medium text-gray-800 mb-2">Tips for Meditation</h3>
