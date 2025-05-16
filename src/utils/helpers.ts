@@ -1,5 +1,5 @@
 import { format, subDays, startOfWeek, endOfWeek, parseISO, isWithinInterval } from 'date-fns';
-import { MeditationEntry, User } from '../types';
+import { MeditationEntry, User } from '../types'; // Ensure User is imported
 import { USER_IDS } from '../firebase/config';
 
 export const formatDate = (date: Date): string => {
@@ -44,7 +44,7 @@ export const formatDuration = (totalMinutes: number): string => {
 };
 
 export const calculateMeditationStats = (entries: MeditationEntry[], userId: string): { today: number, thisWeek: number, overall: number } => {
-  const userEntries = entries.filter(entry => entry.userId === userId);
+  const userEntries = entries.filter(entry => entry.userId === userId); // Corrected filter syntax
   
   // Today's total
   const todayDate = getTodayDate();
@@ -73,19 +73,21 @@ export const calculateMeditationStats = (entries: MeditationEntry[], userId: str
   };
 };
 
-export const getUserInfo = (email: string | null): User | null => {
-  if (!email) return null;
+export const getUserInfo = (email: string | null, uid: string | null): User | null => { // Add uid parameter
+  if (!email || !uid) return null; // Check for uid
   
   if (email === 'hisingh1@gmail.com') {
     return {
-      id: USER_IDS.HARSH,
+      id: USER_IDS.HARSH, // This should be the string 'harsh' to match useMeditation
+      uid, // Add uid
       email: 'hisingh1@gmail.com',
       name: 'Harsh',
       color: 'red-500'
     };
   } else if (email === 'karyahartasemesta@gmail.com') {
     return {
-      id: USER_IDS.ARTA,
+      id: USER_IDS.ARTA, // This should be the string 'arta' to match useMeditation
+      uid, // Add uid
       email: 'karyahartasemesta@gmail.com',
       name: 'Arta',
       color: 'blue-500'

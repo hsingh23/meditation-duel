@@ -1,5 +1,6 @@
 export interface User {
-  id: string;
+  id: string; // This can be 'harsh' or 'arta'
+  uid: string; // Firebase auth UID
   email: string;
   name: string;
   color: string;

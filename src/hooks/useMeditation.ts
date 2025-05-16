@@ -11,7 +11,7 @@ import {
   Timestamp, 
   getDoc 
 } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db, USER_IDS } from '../firebase/config'; // Import USER_IDS
 import { MeditationEntry, User, UserWithStats } from '../types';
 import { calculateMeditationStats, calculateTotalMinutes, formatDate } from '../utils/helpers';
 
@@ -51,6 +51,7 @@ export const useMeditation = (currentUser: User | null) => {
       // Fetch users and calculate their stats
       const harshUser: User = {
         id: 'harsh',
+        uid: USER_IDS.HARSH, // Add Firebase UID
         email: 'hisingh1@gmail.com',
         name: 'Harsh',
         color: 'red-500'
@@ -58,13 +59,14 @@ export const useMeditation = (currentUser: User | null) => {
       
       const artaUser: User = {
         id: 'arta',
+        uid: USER_IDS.ARTA, // Add Firebase UID
         email: 'karyahartasemesta@gmail.com',
         name: 'Arta',
         color: 'blue-500'
       };
       
-      const harshStats = calculateMeditationStats(fetchedEntries, 'harsh');
-      const artaStats = calculateMeditationStats(fetchedEntries, 'arta');
+      const harshStats = calculateMeditationStats(fetchedEntries, USER_IDS.HARSH);
+      const artaStats = calculateMeditationStats(fetchedEntries, USER_IDS.ARTA);
       
       setUsers([
         { ...harshUser, stats: harshStats },
@@ -81,7 +83,7 @@ export const useMeditation = (currentUser: User | null) => {
 
   // Add or update a meditation entry
   const saveEntry = async (date: string, hours: number, minutes: number) => {
-    if (!currentUser) return;
+    if (!currentUser || !currentUser.uid) return; // Check for uid
     
     try {
       setLoading(true);
@@ -91,7 +93,7 @@ export const useMeditation = (currentUser: User | null) => {
       const entriesRef = collection(db, 'meditationEntries');
       const q = query(
         entriesRef, 
-        where('userId', '==', currentUser.id),
+        where('userId', '==', currentUser.uid), // Use currentUser.uid
         where('date', '==', date)
       );
       
@@ -100,7 +102,7 @@ export const useMeditation = (currentUser: User | null) => {
       if (querySnapshot.empty) {
         // Create new entry
         await addDoc(entriesRef, {
-          userId: currentUser.id,
+          userId: currentUser.uid, // Use currentUser.uid
           date,
           hours,
           minutes,
@@ -132,10 +134,10 @@ export const useMeditation = (currentUser: User | null) => {
 
   // Get entry for a specific date
   const getEntryForDate = (date: string): MeditationEntry | null => {
-    if (!currentUser) return null;
+    if (!currentUser || !currentUser.uid) return null; // Check for uid
     
     return entries.find(entry => 
-      entry.userId === currentUser.id && entry.date === date
+      entry.userId === currentUser.uid && entry.date === date // Use currentUser.uid
     ) || null;
   };
 
