@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /meditationEntries/{entryId} {
+      // Allow read access to authenticated users
+      allow read: if request.auth != null;
+      
+      // Allow write access only if the user is writing their own data
+      allow write: if request.auth != null
+        && (
+          // Harsh's user ID
+          (request.auth.uid == 'AnVBZFxhnsZGp3FNRLfUgOWxRvK2' && request.resource.data.userId == 'AnVBZFxhnsZGp3FNRLfUgOWxRvK2')
+          ||
+          // Arta's user ID
+          (request.auth.uid == '2hpLSai3gnbjyhwGsfYtm1JHNaA3' && request.resource.data.userId == '2hpLSai3gnbjyhwGsfYtm1JHNaA3')
+        )
+        // Validate data structure
+        && request.resource.data.keys().hasAll(['userId', 'date', 'hours', 'minutes', 'totalMinutes', 'createdAt', 'updatedAt'])
+        && request.resource.data.userId is string
+        && request.resource.data.date is string
+        && request.resource.data.hours is number
+        && request.resource.data.minutes is number
+        && request.resource.data.totalMinutes is number
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+    }
+  }
+}
